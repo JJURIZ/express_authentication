@@ -37,3 +37,4 @@ describe('GET /profile', function() {
     });
   });
 });
+

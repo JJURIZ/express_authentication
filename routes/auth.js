@@ -38,8 +38,8 @@ router.post('/signup', (req, res) => {
     }
   })
   .catch(err => {
-    console.log('Error', err)
-    req.flash('error', 'Either email or password is incorrect. Please try again')
+    console.log('Error', err);
+    req.flash('error', 'Either email or password is incorrect. Please try again');
     res.redirect('/auth/signup');
   })
 });
