@@ -11,7 +11,6 @@ router.get('/login', (req, res) => {
   res.render('auth/login');
 });
 
-
 router.post('/signup', (req, res) => {
   console.log(req.body);
 
@@ -43,8 +42,19 @@ router.post('/signup', (req, res) => {
     req.flash('error', 'Either email or password is incorrect. Please try again')
     res.redirect('/auth/signup');
   })
-})
+});
 
+router.post('/login', passport.authenticate('local', { 
+  successRedirect: '/',
+  failureRedirect: '/auth/login',
+  successFlash: 'Welcome back...',
+  failureFlash: 'Either email or password is incorrect. Please try again.'
+ }));
 
+ router.get('/logout', (req, res) => {
+  req.logOut();
+  req.flash('success', 'Logging out... See you soon.');
+  res.redirect('/');
+ })
 
 module.exports = router;
