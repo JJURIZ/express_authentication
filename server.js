@@ -18,7 +18,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(layouts);
 // Using flash throughout app to send temp messages to user
 app.use(flash());
-app.use(session(sessionObject));
+
 
 // secret: What we actually will be giving the user on our site as a session cookie. 
 // resave: Save the session even if it's modified, make this false
@@ -33,6 +33,7 @@ const sessionObject = {
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(session(sessionObject));
 // Messages that will be accessible to every view
 app.use((req, res, next) => {
   // Before every route, we will attach a user to res.local
