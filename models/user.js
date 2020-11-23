@@ -1,8 +1,6 @@
-'use strict';
-const bcrypt = require('bcrypt');
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const bcrypt = require("bcrypt");
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class user extends Model {
     /**
@@ -13,59 +11,63 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  };
-  user.init({
-
-    name: {
-      type: DataTypes.STRING,
-      validate: {
-        len: {
-          args: [1,99],
-          msg: 'Name must be between 1 and 99 characters'
-        }
-      }
+  }
+  user.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        validate: {
+          len: {
+            args: [1, 99],
+            msg: "Name must be between 1 and 99 characters",
+          },
+        },
+      },
+      email: {
+        type: DataTypes.STRING,
+        validate: {
+          isEmail: {
+            msg: "Invalid email",
+          },
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        validate: {
+          len: {
+            args: [12, 99],
+            msg: "Password must be between 12 and 99 characters",
+          },
+        },
+      },
     },
-    email: {
-      type: DataTypes.STRING,
-      validate: {
-        isEmail: {
-          msg: 'Invalid email'
-        }
-      }
-    },
-    password: DataTypes.STRING,
-    validate: {
-      len: {
-        args: [12,99],
-        msg: 'Password must be between 12 and 99 characters'
-      }
+    {
+      sequelize,
+      modelName: "user",
     }
-  }, 
-  {
-    sequelize,
-    modelName: 'user',
+  );
+
+  user.addHook("beforeCreate", (pendingUser) => {
+    // bcrypt hash a password for us
+    let hash = bcrypt.hashSync(pendingUser.password, 12);
+
+    // Set password to equal the hash
+    pendingUser.password = hash;
   });
+
+  user.prototype.validPassword = function (passwordTyped) {
+    let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
+
+    // returns boolean based on correct password or not
+    return correctPassword;
+  };
+
+  // Remove the password before it get serialized
+  user.prototype.toJSON = function () {
+    let userData = this.get();
+    delete userData.password;
+    return userData;
+  };
+
   return user;
 };
-
-user.addHook('beforeCreate', (pendingUser) => {
-  // bcrypt hash a password for us
-  let hash = bcrypt.hashSync(pendingUser.password, 12)
-
-  // Set password to equal the hash
-  pendingUser.password = hash;
-})
-
-user.prototype.validPassword = function(passwordTyped) {
-  let correctPassword = bcrypt.compareSync(passwordTyped, this.password);
-  
-  // returns boolean based on correct password or not
-  return correctPassword;
-};
-
-// Remove the password before it get serialized
-user.prototype.toJSON = function() {
-  let userData = this.get();
-  delete userData.password;
-  return userData;
-}
