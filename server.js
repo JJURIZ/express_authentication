@@ -30,8 +30,6 @@ const sessionObject = {
 }
 
 // Initialize passport and run through middleware
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(session(sessionObject));
 // Messages that will be accessible to every view
@@ -41,6 +39,10 @@ app.use((req, res, next) => {
   res.locals.currentUser = req.user;
   next();
 })
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.get('/', (req, res) => {
   console.log(res.locals.alerts)
@@ -54,7 +56,7 @@ app.get('/profile', isLoggedIn, (req, res) => {
 app.use('/auth', require('./routes/auth'));
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
   console.log(`🎧 You're listening to the smooth sounds of port ${PORT} 🎧`);
 });
